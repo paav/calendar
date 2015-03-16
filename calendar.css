@@ -1,0 +1,78 @@
+.calendar {
+  border-collapse: collapse;
+}
+
+.calendar td {
+	padding: 5px;
+	border: 1px solid grey;
+}
+
+div.paav-calendar {
+  font-family: sans-serif !important;
+  cursor: default;
+  display: inline-block;
+  position: relative;
+}
+div.paav-calendar table {
+  background: #fff;
+  border: 1px solid #a3a3a3; 
+  border-collapse: collapse;
+  margin: 0 !important;
+  margin-left: 0px !important;
+  margin-top: -3px !important;
+  position: absolute;
+}
+div.paav-calendar #prev-month,#next-month,.date-cell {
+  cursor: pointer;
+}
+div.paav-calendar .month-selection {
+  color: #000099;
+  font-weight: bold;
+}
+div.paav-calendar .day-names td {
+  font-weight: bold;
+  padding: 0 4px 4px 4px !important;
+  text-align: center;
+}
+div.paav-calendar .date-cell:hover {
+  background: #ccc;
+}
+div.paav-calendar td {
+  border: none;
+  padding: 2px !important;
+  text-align: center; 
+}
+div.paav-calendar .today-cell {
+  font-weight: bold;
+  border: 1px solid black;
+}
+div.paav-calendar .selected-cell {
+  background: #ccc;
+}
+#calendar-place-div {
+  position: relative;
+}
+
+#calendar-inner-div {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  background: white;
+}
+
+#calendar-inner-div table {
+  border: 1px solid black;
+}
+
+#calendar-inner-div td { 
+}
+
+#calendar-inner-div th {
+}
+
+#current-date {
+  border: 1px solid black;
+  font-weight: bold;
+}
+
+
