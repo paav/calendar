@@ -1,8 +1,8 @@
 var paav = {};
 
 paav.date = (function($) {
-  var PDate = function(strDate) {
-    this._date = new Date(strDate);
+  var PDate = function(value) {
+    this._date = new Date(value);
   };
 
   PDate._monthNames = [
@@ -54,6 +54,29 @@ paav.date = (function($) {
     return +this._date == +date;
   };
 
+  PDate.prototype.clone = function() {
+    return new Date(+this._date);
+  };
+
+  PDate.prototype.format = function(format) {
+    var
+      strDate,
+      pad = paav.lib.strPad;
+
+    switch (format) {
+      case 'yyyy-mm-dd':
+        strDate = [
+          this._date.getFullYear(),
+          pad(this._date.getMonth() + 1, 2, '0'),
+          pad(this._date.getDate(), 2, '0'),
+        ].join('-');
+
+        break;
+    }
+
+    return strDate;
+  };
+
   [
     'getFullYear',
     'getMonth',
@@ -63,6 +86,7 @@ paav.date = (function($) {
     'setMonth',
     'valueOf',
     'toString',
+    'setDate',
   ].forEach(function (key) {
       PDate.prototype[key] = function () {
           return Date.prototype[key].apply(this._date, arguments);
@@ -84,8 +108,18 @@ paav.lib = (function($) {
       .html();
   }
 
+  function strPad(string, length, pad) {
+    string += '';
+
+    while (string.length < length)
+      string = pad + string;
+
+    return string;
+  }
+
   return {
     addClassIf: addClassIf,
+    strPad: strPad,
   };
 })(jQuery);
 
@@ -127,6 +161,7 @@ paav.calendar = (function($) {
       box: 'calendar',
       today: 'today',
       picked: 'picked',
+      dates: 'dates',
     },
   };
 
@@ -152,7 +187,7 @@ paav.calendar = (function($) {
             '<td>вс</td>' +
           '</tr>' +
         '</thead>' +
-        '<tbody class="dates">' +
+        '<tbody class="' + classes.dates + '">' +
         '</tbody>' +
       '</table>';
 
@@ -173,6 +208,7 @@ paav.calendar = (function($) {
   Calendar.prototype._bindEvents = function() {
     this._$box.on('click', this._selectors.prevMonth, this._onMonthChange.bind(this));
     this._$box.on('click', this._selectors.nextMonth, this._onMonthChange.bind(this));
+    this._$box.on('click', this._selectors.dates + ' td:not(.empty)', this._onDateClick.bind(this));
   };
 
   Calendar.prototype._buildDates = function() {
@@ -297,6 +333,17 @@ paav.calendar = (function($) {
 
     this._setDates();
     this._setMonth();
+  };
+
+  Calendar.prototype._onDateClick = function(e) {
+    var
+      $cell = $(e.target);
+
+    this._picked = new paav.date(+this._date.setDate($cell.text())); 
+
+    this._setDates();
+
+    this._$el.val(this._picked.format('yyyy-mm-dd'));
   };
 
   Calendar.prototype._setMonth = function() {
