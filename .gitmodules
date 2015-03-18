@@ -1,0 +1,6 @@
+[submodule "lib/paav/lib"]
+	path = lib/paav/lib
+	url = https://github.com/paav/lib
+[submodule "lib/paav/pdate"]
+	path = lib/paav/pdate
+	url = https://github.com/paav/pdate

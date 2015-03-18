@@ -11,10 +11,15 @@ vim: ts=2:sw=2:sts=2
   <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 <![endif]-->
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script src="../lib/paav/pdate/pdate.js"></script>
+<script src="../lib/paav/lib/lib.js"></script>
 <script src="../calendar.js"></script>
 <link href="../calendar.css" rel="stylesheet">
 <script>
   $(function() {
+    if (typeof paav.calendar === 'undefined')
+      throw new Error('This page requires paav.calendar');
+
     paav.calendar.create('.datesetter');
   });
 </script>
