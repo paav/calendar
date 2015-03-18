@@ -5,6 +5,34 @@
 .calendar td {
 	padding: 5px;
 	border: 1px solid grey;
+  text-align: center;
+}
+
+.calendar .prev-month,
+.calendar .next-month {
+  cursor: pointer;
+}
+
+.calendar .month {
+	padding: 5px;
+	border: 1px solid grey;
+}
+
+.calendar .day-names {
+  font-weight: bold;
+}
+
+.calendar .dates td:not(.empty):hover {
+  background: grey;
+  cursor: pointer;
+}
+
+.calendar .today {
+  border: 2px solid #000;
+}
+
+.calendar .picked {
+  background: green;
 }
 
 div.paav-calendar {

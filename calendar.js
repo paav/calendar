@@ -1,8 +1,8 @@
 var paav = {};
 
 paav.date = (function($) {
-  var PDate = function() {
-    this._date = new Date('2015-04-01');
+  var PDate = function(strDate) {
+    this._date = new Date(strDate);
   };
 
   PDate._monthNames = [
@@ -22,7 +22,7 @@ paav.date = (function($) {
 
   PDate.prototype.getMonthFirstDay = function() {
     var
-       oFirstDate = new Date(this._date.getFullYear(), this._date.getMonth()),
+      oFirstDate = new Date(this._date.getFullYear(), this._date.getMonth()),
       firstDay = oFirstDate.getDay();
 
     return firstDay === 0 ? 6 : firstDay - 1;
@@ -46,14 +46,23 @@ paav.date = (function($) {
   PDate.prototype.prevMonth = function() {
     this._date.setMonth(this._date.getMonth() - 1);
   };
+  
+  /**
+   * @param {PDate} date to compare with
+   */
+  PDate.prototype.equals = function(date) {
+    return +this._date == +date;
+  };
 
   [
-    'geFullYear',
+    'getFullYear',
     'getMonth',
     'getDate',
     'getDay',
     'getDate',
     'setMonth',
+    'valueOf',
+    'toString',
   ].forEach(function (key) {
       PDate.prototype[key] = function () {
           return Date.prototype[key].apply(this._date, arguments);
@@ -61,6 +70,23 @@ paav.date = (function($) {
   });
 
   return PDate;
+})(jQuery);
+
+paav.lib = (function($) {
+  function addClassIf(htmlString, className, callback) {
+    if (!callback())
+      return htmlString;
+
+    return $(htmlString)
+      .addClass(className)
+      .wrap('<div></div>')
+      .parent()
+      .html();
+  }
+
+  return {
+    addClassIf: addClassIf,
+  };
 })(jQuery);
 
 paav.calendar = (function($) {
@@ -75,14 +101,15 @@ paav.calendar = (function($) {
 
     this._$el = $(el);
     this._options = $.extend(self._defaults, options);
-    this._date = new paav.date(); 
+    this._date = new paav.date('2015-05-15'); 
+    this._picked = new paav.date('2015-05-15');
 
     this._selectors = self._makeSelectors(this._options.classes);
 
     this._$box = self._buildBox(this._options.classes);
     this._$dates = this._$box
       .find('tbody')
-      .html(self._buildDates(this._date));
+      .html(this._buildDates(this._date));
 
     this._$month = this._$box.find(this._selectors.month);
     this._setMonth();
@@ -98,6 +125,8 @@ paav.calendar = (function($) {
       nextMonth: 'next-month',
       month: 'month',
       box: 'calendar',
+      today: 'today',
+      picked: 'picked',
     },
   };
 
@@ -113,7 +142,7 @@ paav.calendar = (function($) {
             '<td class="' + classes.month + '" colspan="5"></td>' +
             '<td class="' + classes.nextMonth + '">&raquo</td>' +
           '</tr>' +
-          '<tr>' +
+          '<tr class="day-names">' +
             '<td>пн</td>' +
             '<td>вт</td>' +
             '<td>ср</td>' +
@@ -123,7 +152,7 @@ paav.calendar = (function($) {
             '<td>вс</td>' +
           '</tr>' +
         '</thead>' +
-        '<tbody>' +
+        '<tbody class="dates">' +
         '</tbody>' +
       '</table>';
 
@@ -146,33 +175,66 @@ paav.calendar = (function($) {
     this._$box.on('click', this._selectors.nextMonth, this._onMonthChange.bind(this));
   };
 
-  /**
-   *
-   * @param {PDate} pdate paav.date object
-   */
-  Calendar._buildDates = function(pdate) {
+  Calendar.prototype._buildDates = function() {
     var
-      monthFirstDay = pdate.getMonthFirstDay(),
-      monthLastDate = pdate.getMonthLastDate(),
+      oDate = this._date,
+      oPickedDate = this._picked,
+      oToday = new paav.date('2015-05-02'),
+      monthFirstDay = oDate.getMonthFirstDay(),
+      monthLastDate = oDate.getMonthLastDate(),
       html = '<tr>',
       date,
+      cell,
+      addClass,
       i;
 
     for (i = 0; i < monthFirstDay; i++)  {
-      html += '<td></td>';
+      html += '<td class="empty"></td>';
     }
 
     //var monthLastDateDate = (new Date(year, month + 1, 0)).getDate();
 
+    addClass = function(date, htmlString) {
+      var
+        classes = this._options.classes,
+        dates = [
+          {
+            date: oPickedDate,
+            className: classes.picked,
+          },
+          {
+            date: oToday,
+            className: classes.today,
+          },
+        ],
+        oTargetDate,
+        newHtml = htmlString;
+
+      $.each(dates, function(i, val) {
+        oTargetDate = val.date;
+
+        newHtml = paav.lib.addClassIf(newHtml, val.className, function() {
+          return date === oTargetDate.getDate() &&
+            oDate.getFullYear() === oTargetDate.getFullYear() &&
+            oDate.getMonth() === oTargetDate.getMonth();
+        });
+      });
+
+      return newHtml;
+
+    }.bind(this);
+
     for (date = 0; date < monthLastDate; i++) {
-      html += '<td>' + (++date) + '</td>';
+      cell = '<td>' + (++date) + '</td>';
+
+      html += addClass(date, cell);
 
       if (i % 7 == 6)
         html += '</tr><tr>';
     }
 
     for (; i % 7 !== 0; i++)
-      html += '<td></td>';
+      html += '<td class="empty"></td>';
 
     return html;
 
@@ -238,11 +300,11 @@ paav.calendar = (function($) {
   };
 
   Calendar.prototype._setMonth = function() {
-    this._$month.text(this._date.getMonthName());
+    this._$month.text(this._date.getMonthName() + ' ' + this._date.getFullYear());
   };
 
   Calendar.prototype._setDates = function() {
-    this._$dates.html(Calendar._buildDates(this._date)); 
+    this._$dates.html(this._buildDates(this._date)); 
   };
 
   var  defaults = {
