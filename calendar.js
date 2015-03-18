@@ -60,17 +60,28 @@ paav.date = (function($) {
 
   PDate.prototype.format = function(format) {
     var
+      oDate = this._date,
       strDate,
-      pad = paav.lib.strPad;
+      pad = paav.lib.strPad,
+      year = oDate.getFullYear(),
+      month = oDate.getMonth() + 1,
+      date = oDate.getDate();
 
     switch (format) {
       case 'yyyy-mm-dd':
         strDate = [
-          this._date.getFullYear(),
-          pad(this._date.getMonth() + 1, 2, '0'),
-          pad(this._date.getDate(), 2, '0'),
+          year,
+          pad(month, 2, '0'),
+          pad(date, 2, '0'),
         ].join('-');
+        break;
 
+      case 'dd.mm.yyyy':
+        strDate = [
+          pad(date, 2, '0'),
+          pad(month, 2, '0'),
+          year,
+        ].join('.');
         break;
     }
 
@@ -146,7 +157,10 @@ paav.calendar = (function($) {
       .html(this._buildDates(this._date));
 
     this._$month = this._$box.find(this._selectors.month);
+    this._$year = this._$box.find(this._selectors.year);
+
     this._setMonth();
+    this._setYear();
 
     this._$el.after(this._$box);
 
@@ -155,13 +169,17 @@ paav.calendar = (function($) {
 
   Calendar._defaults = {
     classes: {
-      prevMonth: 'prev-month',
-      nextMonth: 'next-month',
+      prevMonth: 'prev',
+      nextMonth: 'next',
+      year: 'year',
       month: 'month',
-      box: 'calendar',
+      box: 'box',
       today: 'today',
       picked: 'picked',
       dates: 'dates',
+      datesBox: 'datesBox',
+      header: 'header',
+      title: 'title',
     },
   };
 
@@ -170,26 +188,31 @@ paav.calendar = (function($) {
    */
   Calendar._buildBox = function(classes) {
     var tmpl =
-      '<table class="' + classes.box + '">' +
-        '<thead>' +
-          '<tr>' +
-            '<td class="' + classes.prevMonth + '">&laquo</td>' +
-            '<td class="' + classes.month + '" colspan="5"></td>' +
-            '<td class="' + classes.nextMonth + '">&raquo</td>' +
-          '</tr>' +
-          '<tr class="day-names">' +
-            '<td>пн</td>' +
-            '<td>вт</td>' +
-            '<td>ср</td>' +
-            '<td>чт</td>' +
-            '<td>пт</td>' +
-            '<td>сб</td>' +
-            '<td>вс</td>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody class="' + classes.dates + '">' +
-        '</tbody>' +
-      '</table>';
+      '<div class="' + classes.box + '">' +
+        '<div class="' + classes.header + '">' +
+          '<a class="' + classes.prevMonth + '">◀</a>' +
+          '<a class="' + classes.nextMonth + '">▶</a>' +
+          '<div class="' + classes.title + '">' +
+            '<span class="' + classes.month + '"></span>' +
+            '<span class="' + classes.year + '"></span>' +
+          '</div>' +
+        '</div>' +
+        '<table class="' + classes.datesBox + '">' +
+          '<thead>' +
+            '<tr class="day-names">' +
+              '<th>Пн</th>' +
+              '<th>Вт</th>' +
+              '<th>Ср</th>' +
+              '<th>Чт</th>' +
+              '<th>Пт</th>' +
+              '<th>Сб</th>' +
+              '<th>Вс</th>' +
+            '</tr>' +
+          '</thead>' +
+          '<tbody class="' + classes.dates + '">' +
+          '</tbody>' +
+        '</table>' +
+      '</div>';
 
     return $(tmpl);
   };
@@ -333,6 +356,7 @@ paav.calendar = (function($) {
 
     this._setDates();
     this._setMonth();
+    this._setYear();
   };
 
   Calendar.prototype._onDateClick = function(e) {
@@ -343,11 +367,15 @@ paav.calendar = (function($) {
 
     this._setDates();
 
-    this._$el.val(this._picked.format('yyyy-mm-dd'));
+    this._$el.val(this._picked.format('dd.mm.yyyy'));
   };
 
   Calendar.prototype._setMonth = function() {
-    this._$month.text(this._date.getMonthName() + ' ' + this._date.getFullYear());
+    this._$month.text(this._date.getMonthName());
+  };
+
+  Calendar.prototype._setYear = function() {
+    this._$year.text(this._date.getFullYear());
   };
 
   Calendar.prototype._setDates = function() {

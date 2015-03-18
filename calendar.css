@@ -1,38 +1,71 @@
-.calendar {
+.box {
+  position: absolute;
+  margin: -1px 0 0 0;
+  border: 1px solid #aaa;
+  font-family: Verdana, Arial, sans-serif;
+  font-size: 13px;
+}
+
+.datesBox {
   border-collapse: collapse;
 }
 
-.calendar td {
-	padding: 5px;
-	border: 1px solid grey;
+.datesBox td,
+.datesBox th {
+	padding: 3px;
+	/*border: 1px solid grey;*/
   text-align: center;
 }
 
-.calendar .prev-month,
-.calendar .next-month {
+.title {
+  font-weight: bold;
+  padding: 5px 0 5px 0;
+  text-align: center;
+}
+
+.prev,
+.next,
+.title {
+  /*display: inline-block;*/
+}
+
+.prev {
+  float: left;
+}
+
+.next {
+  float: right;
+}
+
+.prev,
+.next {
+  padding: 5px;
   cursor: pointer;
 }
 
-.calendar .month {
-	padding: 5px;
-	border: 1px solid grey;
+.month,
+.year {
+  padding: 0 5px 0 5px; 
 }
 
 .calendar .day-names {
   font-weight: bold;
 }
 
-.calendar .dates td:not(.empty):hover {
-  background: grey;
+.dates td:not(.empty):hover {
+  color: #fff;
+  background: #000;
   cursor: pointer;
 }
 
-.calendar .today {
-  border: 2px solid #000;
+.today {
+  border: 1px solid #000;
 }
 
-.calendar .picked {
-  background: green;
+.picked {
+  font-weight: bold;
+  color: #fff;
+  background: #000;
 }
 
 div.paav-calendar {
