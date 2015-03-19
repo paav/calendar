@@ -1,22 +1,4 @@
-
-var paav = paav || {};
-
-+function() {
-  var
-    modules = [
-      [ jQuery, 'jQuery' ],
-      [ paav.date, 'paav.date' ],
-      [ paav.lib, 'paav.lib' ],
-    ],
-    i;
-
-  for (i = 0; i < modules.length; i++) {
-    if (typeof modules[i][0] === 'undefined')
-      throw new Error('paav.calendar requires ' + modules[i][1]);
-  }
-}();
-
-paav.calendar = (function($) {
+define(['jquery', 'pdate', 'plib'], function($, pdate, plib) {
   'use strict';
 
   function Calendar(el, options) {
@@ -28,8 +10,8 @@ paav.calendar = (function($) {
 
     this._$el = $(el);
     this._options = $.extend(self._defaults, options);
-    this._date = new paav.date('2015-05-15'); 
-    this._picked = new paav.date('2015-05-15');
+    this._date = new pdate('2015-05-15'); 
+    this._picked = new pdate('2015-05-15');
 
     this._selectors = self._makeSelectors(this._options.classes);
 
@@ -120,7 +102,7 @@ paav.calendar = (function($) {
     var
       oDate = this._date,
       oPickedDate = this._picked,
-      oToday = new paav.date('2015-05-02'),
+      oToday = new pdate('2015-05-02'),
       monthFirstDay = oDate.getMonthFirstDay(),
       monthLastDate = oDate.getMonthLastDate(),
       html = '<tr>',
@@ -154,7 +136,7 @@ paav.calendar = (function($) {
       $.each(dates, function(i, val) {
         oTargetDate = val.date;
 
-        newHtml = paav.lib.addClassIf(newHtml, val.className, function() {
+        newHtml = plib.addClassIf(newHtml, val.className, function() {
           return date === oTargetDate.getDate() &&
             oDate.getFullYear() === oTargetDate.getFullYear() &&
             oDate.getMonth() === oTargetDate.getMonth();
@@ -245,7 +227,7 @@ paav.calendar = (function($) {
     var
       $cell = $(e.target);
 
-    this._picked = new paav.date(+this._date.setDate($cell.text())); 
+    this._picked = new pdate(+this._date.setDate($cell.text())); 
 
     this._setDates();
 
@@ -284,4 +266,4 @@ paav.calendar = (function($) {
   return {
     create: create,
   };
-})(jQuery);
+});
