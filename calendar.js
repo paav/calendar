@@ -255,7 +255,7 @@ define(['jquery', 'pdate', 'plib'], function($, pdate, plib) {
 
     var $el = $(selector);
     
-    if (!$el) return;
+    if ($el.length === 0) return;
 
     var inst = new Calendar($el[0]);
   };
