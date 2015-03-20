@@ -1,4 +1,4 @@
-define(['jquery', 'pdate', 'lib'], function($, pdate, plib) {
+define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
   'use strict';
 
   function Calendar(el, options) {
