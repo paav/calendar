@@ -8,7 +8,6 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
     if (el === 'undefined' || el.tagName !== 'INPUT')
       throw new Error('undefined or not input element');
 
-    this._$el = $(el);
     this._options = $.extend(self._defaults, options);
     this._date = new pdate('2015-05-15'); 
     this._picked = new pdate('2015-05-15');
@@ -16,6 +15,7 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
     this._selectors = self._makeSelectors(this._options.classes);
 
     this._$box = self._buildBox(this._options.classes);
+
     this._$dates = this._$box
       .find('tbody')
       .html(this._buildDates(this._date));
@@ -26,13 +26,20 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
     this._setMonth();
     this._setYear();
 
+    this._$el = $(el);
+    this._$el.attr('autocomplete', 'off');
+    this._$el.addClass(this._options.classes.el);
+
     this._$el.after(this._$box);
+
+    this._$box.hide();
 
     this._bindEvents();
   }
 
   Calendar._defaults = {
     classes: {
+      el: 'el',
       prevMonth: 'prev',
       nextMonth: 'next',
       year: 'year',
@@ -93,6 +100,8 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
   };
 
   Calendar.prototype._bindEvents = function() {
+    $(document.body).on('click', this._onBodyClick.bind(this));
+    this._$el.on('click', function() { this._$box.toggle(); }.bind(this));
     this._$box.on('click', this._selectors.prevMonth, this._onMonthChange.bind(this));
     this._$box.on('click', this._selectors.nextMonth, this._onMonthChange.bind(this));
     this._$box.on('click', this._selectors.dates + ' td:not(.empty)', this._onDateClick.bind(this));
@@ -204,6 +213,13 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
     return $month[0];
   };
 
+  Calendar.prototype._onBodyClick = function(e) {
+    if ($(e.target).is(this._$el))
+      return;
+
+    this._$box.hide();
+  };
+
   Calendar.prototype._onMonthChange = function(e) {
     var
       classes = this._options.classes;
@@ -221,6 +237,8 @@ define(['jquery', 'pdate', 'lib', 'css!calendar'], function($, pdate, plib) {
     this._setDates();
     this._setMonth();
     this._setYear();
+
+    e.stopPropagation();
   };
 
   Calendar.prototype._onDateClick = function(e) {
